@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=320">
+<title>3DS Test Page</title>
+
+<style>
+body {
+    background-color: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+button {
+    width: 200px;
+    height: 50px;
+    margin: 10px;
+    font-size: 18px;
+    background-color: #ff3c00;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+
+button:active {
+    background-color: #cc2f00;
+}
+
+#message {
+    margin-top: 20px;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Welkom 3DS 👾</h1>
+
+<button onclick="showMessage()">Klik mij</button>
+<button onclick="changeColor()">Verander kleur</button>
+
+<div id="message"></div>
+
+<script>
+function showMessage() {
+    document.getElementById("message").innerHTML = "Het werkt op je 3DS!";
+}
+
+function changeColor() {
+    document.body.style.backgroundColor = "#0044ff";
+}
+</script>
+
+</body>
+</html>
