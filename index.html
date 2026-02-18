@@ -3,54 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=320">
-<title>3DS Test Page</title>
+<title>3DS Voice</title>
 
 <style>
 body {
-    background-color: #111;
+    background-color: #000;
     color: white;
-    font-family: Arial, sans-serif;
     text-align: center;
+    font-family: Arial;
 }
 
 button {
-    width: 200px;
-    height: 50px;
-    margin: 10px;
-    font-size: 18px;
-    background-color: #ff3c00;
-    color: white;
+    width: 220px;
+    height: 60px;
+    font-size: 20px;
+    margin-top: 40px;
+    background-color: orange;
     border: none;
-    border-radius: 8px;
-}
-
-button:active {
-    background-color: #cc2f00;
-}
-
-#message {
-    margin-top: 20px;
-    font-size: 16px;
+    border-radius: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Welkom 3DS 👾</h1>
+<h2>3DS Voice Button</h2>
 
-<button onclick="showMessage()">Klik mij</button>
-<button onclick="changeColor()">Verander kleur</button>
+<button onclick="playVoice()">Klik om te praten</button>
 
-<div id="message"></div>
+<audio id="voice">
+    <source src="voice.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-function showMessage() {
-    document.getElementById("message").innerHTML = "Het werkt op je 3DS!";
-}
-
-function changeColor() {
-    document.body.style.backgroundColor = "#0044ff";
+function playVoice() {
+    var audio = document.getElementById("voice");
+    audio.play();
 }
 </script>
 
