@@ -8,8 +8,7 @@
 body { background:#222; color:white; text-align:center; font-family:Arial; }
 .container { width:300px; margin:0 auto; }
 .item { background:#444; margin:10px 0; padding:10px; }
-button { width:100%; height:40px; font-size:16px; background:orange; border:none; cursor:pointer; }
-h3 { margin-top:20px; }
+button { width:100%; height:40px; font-size:16px; background:orange; border:none; }
 </style>
 </head>
 <body>
@@ -19,74 +18,73 @@ h3 { margin-top:20px; }
 
 <div class="item">
 🍔 Hamburger - €5<br><br>
-<button onclick="addItem('Hamburger',5)">Bestel</button>
+<button onclick="addItem('Hamburger')">Bestel</button>
 </div>
 
 <div class="item">
 🍟 Friet - €3<br><br>
-<button onclick="addItem('Friet',3)">Bestel</button>
+<button onclick="addItem('Friet')">Bestel</button>
 </div>
 
 <div class="item">
 🥤 Drink - €2<br><br>
-<button onclick="addItem('Drink',2)">Bestel</button>
+<button onclick="addItem('Drink')">Bestel</button>
 </div>
 
-<h3>Totaal: €<span id="total">0</span></h3>
-<button onclick="resetOrder()">Reset totaal</button>
 </div>
 
 <script>
-// Simpel order nummer
-var orderNumber = 1;
-var total = 0;
 
-// JSON endpoint (bijvoorbeeld jsonbin.io of een andere host)
-var jsonEndpoint = "https://api.jsonbin.io/v3/b/YOUR_BIN_ID"; // <- vervang dit
+var endpoint = "https://api.jsonbin.io/v3/b/6996206fae596e708f3543ad";
+var masterKey = "$2a$10$7CEnCoPL4ibEoqYWUdMfWeV1LiwaHjd.YoSMNbbg/6vK5EU0i0UGW";
 
-function addItem(name, price){
-    total += price;
-    document.getElementById("total").innerHTML = total;
+function addItem(itemName){
 
-    // Maak order object
-    var order = {
-        number: orderNumber,
-        item: name,
-        status: "In Bereiding"
-    };
-
-    // POST/PUT naar JSON endpoint
     var xhr = new XMLHttpRequest();
-    xhr.open("PUT", jsonEndpoint, true);
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.open("GET", endpoint + "/latest", true);
+    xhr.setRequestHeader("X-Master-Key", masterKey);
+
     xhr.onreadystatechange = function(){
         if(xhr.readyState == 4){
-            alert("Bestelling geplaatst: " + name);
+
+            var data = JSON.parse(xhr.responseText);
+            var orders = data.record.orders;
+
+            var newNumber = 1;
+            for(var key in orders){
+                if(parseInt(key) >= newNumber){
+                    newNumber = parseInt(key) + 1;
+                }
+            }
+
+            orders[newNumber] = {
+                number: newNumber,
+                item: itemName,
+                status: "In Bereiding"
+            };
+
+            saveOrders(orders);
         }
     };
 
-    // Haal eerst oude data, voeg toe en schrijf opnieuw
-    xhr.onload = function(){
-        var currentData = {};
-        if(xhr.responseText){
-            try { currentData = JSON.parse(xhr.responseText); } catch(e){ currentData = {}; }
-        }
-        currentData[orderNumber] = order;
-        // Nieuw PUT request
-        var xhr2 = new XMLHttpRequest();
-        xhr2.open("PUT", jsonEndpoint, true);
-        xhr2.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr2.send(JSON.stringify(currentData));
+    xhr.send();
+}
+
+function saveOrders(orders){
+
+    var xhr2 = new XMLHttpRequest();
+    xhr2.open("PUT", endpoint, true);
+    xhr2.setRequestHeader("Content-Type", "application/json");
+    xhr2.setRequestHeader("X-Master-Key", masterKey);
+
+    var newData = {
+        orders: orders
     };
 
-    xhr.send(); // Eerste request (kan leeg zijn)
-    orderNumber++;
+    xhr2.send(JSON.stringify(newData));
+    alert("Bestelling geplaatst!");
 }
 
-function resetOrder(){
-    total = 0;
-    document.getElementById("total").innerHTML = total;
-}
 </script>
 
 </body>
