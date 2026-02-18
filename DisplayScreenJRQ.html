@@ -2,64 +2,51 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="10">
-<title>JRQ Display</title>
-
+<meta name="viewport" content="width=320">
+<title>JRQ Display Scherm</title>
 <style>
-body {
-    background-color: black;
-    color: white;
-    font-family: Arial;
-    text-align: center;
-}
-
-.container {
-    width: 90%;
-    margin: 0 auto;
-}
-
-h1 {
-    font-size: 50px;
-    margin-top: 40px;
-}
-
-.status {
-    font-size: 40px;
-    margin: 40px 0;
-    padding: 20px;
-}
-
-.bereiding {
-    background-color: orange;
-    color: black;
-}
-
-.klaar {
-    background-color: limegreen;
-    color: black;
-}
+body { background:black; color:white; font-family:Arial; text-align:center; }
+h1 { font-size:50px; margin-top:40px; }
+.status { font-size:40px; margin:20px; padding:20px; color:black; }
+.bereiding { background-color:orange; }
+.klaar { background-color:limegreen; }
 </style>
 </head>
-
 <body>
 
-<div class="container">
-
 <h1>JRQ Bestellingen</h1>
+<div id="ordersDisplay"></div>
 
-<div class="status bereiding">
-Bestelling #12  
-<br>
-IN BEREIDING
-</div>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-<div class="status klaar">
-Bestelling #11  
-<br>
-KLAAR
-</div>
+<script>
+// Firebase test mode connection
+var firebaseConfig = {
+    databaseURL: "https://jrq-restaurant-default-rtdb.europe-west1.firebasedatabase.app"
+};
+firebase.initializeApp(firebaseConfig);
+var database = firebase.database();
 
-</div>
+var displayDiv = document.getElementById('ordersDisplay');
+
+// Realtime updates
+database.ref('orders').on('value', function(snapshot){
+    displayDiv.innerHTML = '';
+    if(!snapshot.exists()) return;
+
+    snapshot.forEach(function(child){
+        var order = child.val();
+        var className = order.status === "Klaar" ? "klaar" : "bereiding";
+        displayDiv.innerHTML += '<div class="status ' + className + '">' +
+                                'Bestelling #' + order.number + '<br>' +
+                                order.item + '<br>' +
+                                order.status +
+                                '</div>';
+    });
+});
+</script>
 
 </body>
 </html>
