@@ -3,25 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=320">
-<title>3DS Voice</title>
+<title>3DS Restaurant</title>
+
+<style>
+body {
+    background-color: #222;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+}
+
+.container {
+    width: 300px;
+    margin: 0 auto;
+}
+
+.item {
+    background-color: #444;
+    margin: 10px 0;
+    padding: 10px;
+}
+
+button {
+    width: 100%;
+    height: 40px;
+    font-size: 16px;
+    background-color: orange;
+    border: none;
+}
+</style>
 </head>
 
-<body style="background:#000;color:white;text-align:center;font-family:Arial;">
+<body>
 
-<h2>3DS Voice Test</h2>
+<div class="container">
 
-<button onclick="playVoice()" style="width:220px;height:60px;font-size:20px;">
-Speel Stem
-</button>
+<h2>Bestel Menu</h2>
 
-<br><br>
+<div class="item">
+    🍔 Burger - €5
+    <br><br>
+    <button onclick="addItem('Burger', 5)">Bestel</button>
+</div>
 
-<audio id="voice" src="voice.mp3"></audio>
+<div class="item">
+    🍟 Friet - €3
+    <br><br>
+    <button onclick="addItem('Friet', 3)">Bestel</button>
+</div>
+
+<div class="item">
+    🥤 Drink - €2
+    <br><br>
+    <button onclick="addItem('Drink', 2)">Bestel</button>
+</div>
+
+<h3>Totaal: €<span id="total">0</span></h3>
+
+<button onclick="resetOrder()">Reset</button>
+
+</div>
 
 <script>
-function playVoice() {
-    var audio = document.getElementById("voice");
-    audio.play();
+var total = 0;
+
+function addItem(name, price) {
+    total = total + price;
+    document.getElementById("total").innerHTML = total;
+}
+
+function resetOrder() {
+    total = 0;
+    document.getElementById("total").innerHTML = total;
 }
 </script>
 
