@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=320">
-<title>JRQ Restaurant 3DS</title>
+<title>JRQ 3DS Bestel</title>
 <style>
 body { background:#222; color:white; text-align:center; font-family:Arial; }
 .container { width:300px; margin:0 auto; }
@@ -36,51 +36,56 @@ h3 { margin-top:20px; }
 <button onclick="resetOrder()">Reset totaal</button>
 </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
 <script>
-// Firebase test mode connection
-var firebaseConfig = {
-    databaseURL: "https://jrq-restaurant-default-rtdb.europe-west1.firebasedatabase.app"
-};
-firebase.initializeApp(firebaseConfig);
-var database = firebase.database();
-
-// Bestellingen
-var total = 0;
+// Simpel order nummer
 var orderNumber = 1;
+var total = 0;
 
-// Haal hoogste nummer uit database bij laden
-database.ref('orders').once('value', function(snapshot){
-    if(snapshot.exists()){
-        var keys = Object.keys(snapshot.val());
-        orderNumber = Math.max(...keys.map(Number)) + 1;
-    }
-});
+// JSON endpoint (bijvoorbeeld jsonbin.io of een andere host)
+var jsonEndpoint = "https://api.jsonbin.io/v3/b/YOUR_BIN_ID"; // <- vervang dit
 
 function addItem(name, price){
     total += price;
     document.getElementById("total").innerHTML = total;
 
-    var newOrder = {
+    // Maak order object
+    var order = {
         number: orderNumber,
         item: name,
         status: "In Bereiding"
     };
-    database.ref('orders/' + orderNumber).set(newOrder);
+
+    // POST/PUT naar JSON endpoint
+    var xhr = new XMLHttpRequest();
+    xhr.open("PUT", jsonEndpoint, true);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState == 4){
+            alert("Bestelling geplaatst: " + name);
+        }
+    };
+
+    // Haal eerst oude data, voeg toe en schrijf opnieuw
+    xhr.onload = function(){
+        var currentData = {};
+        if(xhr.responseText){
+            try { currentData = JSON.parse(xhr.responseText); } catch(e){ currentData = {}; }
+        }
+        currentData[orderNumber] = order;
+        // Nieuw PUT request
+        var xhr2 = new XMLHttpRequest();
+        xhr2.open("PUT", jsonEndpoint, true);
+        xhr2.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr2.send(JSON.stringify(currentData));
+    };
+
+    xhr.send(); // Eerste request (kan leeg zijn)
     orderNumber++;
 }
 
 function resetOrder(){
-    total=0;
-    document.getElementById("total").innerHTML=total;
-}
-
-// Markeer bestelling als klaar knop (optioneel)
-function markAsKlaar(orderId){
-    database.ref('orders/' + orderId).update({status:"Klaar"});
+    total = 0;
+    document.getElementById("total").innerHTML = total;
 }
 </script>
 
